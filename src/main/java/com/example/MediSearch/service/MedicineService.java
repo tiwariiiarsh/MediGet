@@ -13,4 +13,6 @@ public interface MedicineService {
     MedicineResponse searchMedicineByKeyword(String keyword, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
 
     MedicineDTO updateProduct(Long medicineId, MedicineDTO medicineDTO);
+
+    MedicineDTO deleteMedicine(Long medicineId);
 }
