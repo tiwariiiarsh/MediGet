@@ -9,4 +9,6 @@ public interface MedicineService {
     MedicineResponse getAllMedicines(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder, String keyword);
 
     MedicineResponse getAllMedicinesForSeller(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
+
+    MedicineResponse searchMedicineByKeyword(String keyword, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
 }

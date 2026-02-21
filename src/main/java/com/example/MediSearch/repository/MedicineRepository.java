@@ -11,4 +11,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MedicineRepository extends JpaRepository<Medicine,Long>, JpaSpecificationExecutor<Medicine> {
     Page<Medicine> findByUser(User user, Pageable pageDetails);
+
+
+    Page<Medicine> findByMedicineNameContainingIgnoreCase(String keyword, Pageable pageable);
 }

@@ -49,4 +49,17 @@ public class MedicineController {
         MedicineResponse medicineResponse =  medicineService.getAllMedicinesForSeller(pageNumber,pageSize,sortBy,sortOrder);
         return new ResponseEntity<>(medicineResponse,HttpStatus.OK );
     }
+
+
+    @GetMapping("/public/medicines/{keyword}/keyword")
+    public  ResponseEntity<MedicineResponse>getProductByKeyword(@PathVariable String keyword,
+                                                               @RequestParam(name="pageNumber",defaultValue = AppConstants.PAGE_NUMBER,required = false) Integer pageNumber,
+                                                               @RequestParam(name = "pageSize",defaultValue = AppConstants.PAGE_SIZE,required = false) Integer pageSize,
+                                                               @RequestParam(name = "sortBy",defaultValue = AppConstants.SORT_MEDICINE_BY,required = false) String sortBy,
+                                                               @RequestParam(name = "sortOrder",defaultValue = AppConstants.SORT_DIR,required = false) String sortOrder)
+    {
+        MedicineResponse medicineResponse = medicineService.searchMedicineByKeyword(keyword,pageNumber,pageSize,sortBy,sortOrder);
+        return new ResponseEntity<>(medicineResponse,HttpStatus.FOUND);
+    }
+
 }

@@ -1,6 +1,7 @@
 package com.example.MediSearch.service;
 
 import com.example.MediSearch.Utils.AuthUtils;
+import com.example.MediSearch.exceptions.ApiException;
 import com.example.MediSearch.model.Medicine;
 import com.example.MediSearch.model.User;
 import com.example.MediSearch.payload.MedicineDTO;
@@ -61,17 +62,17 @@ public class MedicineServiceImpl implements MedicineService {
         List<Medicine> products =pageProducts.getContent();
 
         List<MedicineDTO> productDTOS = products.stream()
-                .map(product -> {
-                    MedicineDTO productDTO = modelMapper.map(product, MedicineDTO.class);
-//                    productDTO.setImage(constructImageUrl(product.getImage()));
+                .map(medicine -> {
+                    MedicineDTO productDTO = modelMapper.map(medicine, MedicineDTO.class);
+//                    productDTO.setImage(constructImageUrl(medicine.getImage()));
                     return productDTO;
                 })
                 .toList();
 
 
-//        check is product is zero 0
+//        check is medicine is zero 0
 //        if(products.isEmpty()){
-//            throw new ApiException("product is not present!!");
+//            throw new ApiException("medicine is not present!!");
 //        }
         MedicineResponse productResponse = new MedicineResponse();
         productResponse.setContent(productDTOS);
@@ -95,10 +96,10 @@ public class MedicineServiceImpl implements MedicineService {
         List<Medicine> products =pageMedicine.getContent();
 
         List<MedicineDTO> productDTOS = products.stream()
-                .map(product -> {
-                   MedicineDTO medicineDTO = modelMapper.map(product, MedicineDTO.class);
+                .map(medicine -> {
+                   MedicineDTO medicineDTO = modelMapper.map(medicine, MedicineDTO.class);
 
-//                    productDTO.setImage(constructImageUrl(product.getImage())
+//                    productDTO.setImage(constructImageUrl(medicine.getImage())
                     return medicineDTO;
                 })
                 .toList();
@@ -111,6 +112,51 @@ public class MedicineServiceImpl implements MedicineService {
         productResponse.setTotalElements(productResponse.getTotalElements());
         productResponse.setPageSize(productResponse.getPageSize());
         return productResponse;
+    }
+
+    @Override
+    public MedicineResponse searchMedicineByKeyword(
+            String keyword,
+            Integer pageNumber,
+            Integer pageSize,
+            String sortBy,
+            String sortOrder) {
+
+        // Default sort field safety
+        if (sortBy == null || sortBy.isBlank()) {
+            sortBy = "medicineId";
+        }
+
+        Sort sort = sortOrder.equalsIgnoreCase("asc")
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
+
+        Page<Medicine> pageProducts =
+                medicineRepository.findByMedicineNameContainingIgnoreCase(
+                        keyword,
+                        pageable
+                );
+
+        if (pageProducts.isEmpty()) {
+            throw new ApiException("Medicine not found with keyword: " + keyword);
+        }
+
+        List<MedicineDTO> medicineDTOS = pageProducts.getContent()
+                .stream()
+                .map(medicine -> modelMapper.map(medicine, MedicineDTO.class))
+                .toList();
+
+        MedicineResponse response = new MedicineResponse();
+        response.setContent(medicineDTOS);
+        response.setPageNumber(pageProducts.getNumber());
+        response.setPageSize(pageProducts.getSize());
+        response.setTotalElements(pageProducts.getTotalElements());
+        response.setTotalPages(pageProducts.getTotalPages());
+        response.setLastPage(pageProducts.isLast());
+
+        return response;
     }
 
 
