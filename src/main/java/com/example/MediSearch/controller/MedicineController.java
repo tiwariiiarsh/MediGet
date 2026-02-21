@@ -62,7 +62,7 @@ public class MedicineController {
         return new ResponseEntity<>(medicineResponse,HttpStatus.FOUND);
     }
 
-    @PutMapping("/seller/Medicine/{medicineId}")
+    @PutMapping("/seller/medicine/{medicineId}")
     public ResponseEntity<MedicineDTO>updateMedicine(@Valid @RequestBody MedicineDTO medicineDTO,
                                                    @PathVariable Long medicineId){
         MedicineDTO updateMedicineDTO = medicineService.updateProduct(medicineId,medicineDTO);

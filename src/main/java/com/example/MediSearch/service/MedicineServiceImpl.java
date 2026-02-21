@@ -2,6 +2,7 @@ package com.example.MediSearch.service;
 
 import com.example.MediSearch.Utils.AuthUtils;
 import com.example.MediSearch.exceptions.ApiException;
+import com.example.MediSearch.exceptions.ResourceNotFoundException;
 import com.example.MediSearch.model.Medicine;
 import com.example.MediSearch.model.User;
 import com.example.MediSearch.payload.MedicineDTO;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -157,6 +159,22 @@ public class MedicineServiceImpl implements MedicineService {
         response.setLastPage(pageProducts.isLast());
 
         return response;
+    }
+
+    @Override
+    public MedicineDTO updateProduct(Long medicineId, MedicineDTO medicineDTO) {
+       Medicine medicineFromDB = medicineRepository.findById(medicineId)
+               .orElseThrow(() -> new ResourceNotFoundException("medicine","medicine_Id",medicineId));
+
+       Medicine medicine = modelMapper.map(medicineDTO,Medicine.class);
+       medicineFromDB.setMedicineName(medicine.getMedicineName());
+       medicineFromDB.setDescription(medicine.getDescription());
+       medicineFromDB.setPrice(medicine.getPrice());
+       medicineFromDB.setDiscount(medicine.getDiscount());
+       medicineFromDB.setQuantity(medicine.getQuantity());
+       medicineFromDB.setSpecialPrice(medicine.getSpecialPrice());
+       Medicine savedMedicine = medicineRepository.save(medicineFromDB);
+       return modelMapper.map(savedMedicine,MedicineDTO.class);
     }
 
 

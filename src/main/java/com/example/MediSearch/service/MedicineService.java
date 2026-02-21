@@ -11,4 +11,6 @@ public interface MedicineService {
     MedicineResponse getAllMedicinesForSeller(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
 
     MedicineResponse searchMedicineByKeyword(String keyword, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
+
+    MedicineDTO updateProduct(Long medicineId, MedicineDTO medicineDTO);
 }
