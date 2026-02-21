@@ -69,4 +69,10 @@ public class MedicineController {
         return new ResponseEntity<>(updateMedicineDTO,HttpStatus.OK);
     }
 
+    @DeleteMapping("/seller/medicine/{medicineId}")
+    public  ResponseEntity<MedicineDTO> deleteProduct(@PathVariable Long medicineId){
+        MedicineDTO deleteMedicine = medicineService.deleteMedicine(medicineId);
+        return new ResponseEntity<>(deleteMedicine,HttpStatus.OK);
+    }
+
 }
