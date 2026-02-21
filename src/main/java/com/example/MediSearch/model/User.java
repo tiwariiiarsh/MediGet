@@ -70,9 +70,9 @@ public class User {
 //    @OneToOne(mappedBy = "user", cascade = { CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
 //    private Cart cart;
 //
-//    @ToString.Exclude
-//    @OneToMany(mappedBy = "user",
-//            cascade = {CascadeType.PERSIST, CascadeType.MERGE},
-//            orphanRemoval = true)
-//    private Set<Product> products;
+    @ToString.Exclude
+    @OneToMany(mappedBy = "user",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+            orphanRemoval = true)
+    private Set<Medicine> medicines;
 }

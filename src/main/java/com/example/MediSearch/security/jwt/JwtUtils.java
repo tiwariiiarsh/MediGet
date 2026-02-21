@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 
@@ -134,10 +135,10 @@ public class JwtUtils {
 //    Return → ye Key JWT ko sign karne aur verify karne dono me use hota hai.
 //   -----------Generate signing Key---------------------------
     private Key key() {
-        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
+        return Keys.hmacShaKeyFor(
+                jwtSecret.getBytes(StandardCharsets.UTF_8)
+        );
     }
-
-
     public boolean validateJwtToken(String authToken) {
         try {
             System.out.println("Validate");
