@@ -33,9 +33,6 @@ public class Medicine {
     private Double discount; //25
     private String image;
 
-    @ManyToOne
-    @JoinColumn(name = "seller_id")
-    private User user;
 
     // ================= MANY MEDICINES → ONE SHOP =================
     @ManyToOne
