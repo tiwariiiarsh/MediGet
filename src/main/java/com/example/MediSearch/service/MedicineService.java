@@ -2,6 +2,9 @@ package com.example.MediSearch.service;
 
 import com.example.MediSearch.payload.MedicineDTO;
 import com.example.MediSearch.payload.MedicineResponse;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 public interface MedicineService {
     MedicineDTO addMedicine(MedicineDTO medicineDTO);
@@ -15,4 +18,6 @@ public interface MedicineService {
     MedicineDTO updateProduct(Long medicineId, MedicineDTO medicineDTO);
 
     MedicineDTO deleteMedicine(Long medicineId);
+
+    MedicineDTO updateMedicineImage(Long medicineId, MultipartFile image) throws IOException;
 }

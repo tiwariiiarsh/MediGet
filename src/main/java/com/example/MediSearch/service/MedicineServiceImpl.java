@@ -10,10 +10,13 @@ import com.example.MediSearch.payload.MedicineResponse;
 import com.example.MediSearch.repository.MedicineRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -27,6 +30,15 @@ public class MedicineServiceImpl implements MedicineService {
 
     @Autowired
     private MedicineRepository medicineRepository;
+
+    @Autowired
+    private FileService fileService;
+
+    @Value("${product.image}")
+    private String path;
+
+    @Value("${image.base.url}")
+    private String imageBaseUrl;
 
     // ================= ADD MEDICINE =================
 
@@ -231,5 +243,24 @@ public class MedicineServiceImpl implements MedicineService {
 
         return modelMapper.map(medicineFromDB,
                 MedicineDTO.class);
+    }
+
+    @Override
+    public MedicineDTO updateMedicineImage(Long medicineId, MultipartFile image) throws IOException {
+//        Get medicine from DB'
+        Medicine medicineFromDB = medicineRepository.findById(medicineId)
+                .orElseThrow(() -> new ResourceNotFoundException("medicine","medicineId",medicineId));
+//        Upload image to server
+//        Get file name of uploaded image
+        String path = "images/";
+        String fileName =fileService.uploadImage(path,image);
+
+
+//        updating the new file name to the medicine
+        medicineFromDB.setImage(fileName);
+//        save the updated medicine
+        Medicine updatedmedicine = medicineRepository.save(medicineFromDB);
+//        return DTO after mapping medicine to DTO
+        return  modelMapper.map(updatedmedicine,MedicineDTO.class);
     }
 }
