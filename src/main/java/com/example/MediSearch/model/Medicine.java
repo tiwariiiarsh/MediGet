@@ -36,4 +36,9 @@ public class Medicine {
     @ManyToOne
     @JoinColumn(name = "seller_id")
     private User user;
+
+    // ================= MANY MEDICINES → ONE SHOP =================
+    @ManyToOne
+    @JoinColumn(name = "shop_id", nullable = false)
+    private Shop shop;
 }
