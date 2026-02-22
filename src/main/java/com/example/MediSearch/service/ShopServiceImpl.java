@@ -38,7 +38,7 @@ public class ShopServiceImpl implements ShopService {
 
         Shop shop = modelMapper.map(shopDTO, Shop.class);
         shop.setSeller(seller);
-//
+
         Shop savedShop = shopRepository.save(shop);
 
         return modelMapper.map(savedShop, ShopDTO.class);
