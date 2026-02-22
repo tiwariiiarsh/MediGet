@@ -5,7 +5,7 @@ import com.example.MediSearch.payload.MedicineResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-
+import java.util.List;
 
 public interface MedicineService {
 
@@ -23,7 +23,7 @@ public interface MedicineService {
                                               String sortBy,
                                               String sortOrder);
 
-    List<MedicineSearchResponse> searchNearbyMedicine(
+    List<MedicineDTO> searchNearbyMedicine(
             String keyword,
             Double userLat,
             Double userLng,
