@@ -1,6 +1,7 @@
 package com.example.MediSearch.service;
 
 import com.example.MediSearch.Utils.AuthUtils;
+import com.example.MediSearch.Utils.DistanceUtil;
 import com.example.MediSearch.exceptions.ApiException;
 import com.example.MediSearch.exceptions.ResourceNotFoundException;
 import com.example.MediSearch.model.Medicine;

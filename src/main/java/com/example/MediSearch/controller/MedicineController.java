@@ -1,89 +1,136 @@
 package com.example.MediSearch.controller;
 
-
 import com.example.MediSearch.config.AppConstants;
 import com.example.MediSearch.payload.MedicineDTO;
 import com.example.MediSearch.payload.MedicineResponse;
 import com.example.MediSearch.service.MedicineService;
 import jakarta.validation.Valid;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
 public class MedicineController {
 
-
     @Autowired
     private MedicineService medicineService;
 
-    @PostMapping("/seller/medicine")
-    public ResponseEntity<MedicineDTO> addMedicineBySeller(@Valid  @RequestBody MedicineDTO medicineDTO){
-        MedicineDTO medicine = medicineService.addMedicine(medicineDTO);
-        return new ResponseEntity<MedicineDTO>(medicine, HttpStatus.OK);
+    // ================= ADD MEDICINE =================
+    @PostMapping("/seller/shop/{shopId}/medicine")
+    public ResponseEntity<MedicineDTO> addMedicine(
+            @PathVariable Long shopId,
+            @Valid @RequestBody MedicineDTO medicineDTO) {
+
+        return ResponseEntity.ok(
+                medicineService.addMedicine(shopId, medicineDTO)
+        );
     }
 
-
+    // ================= PUBLIC GET ALL =================
     @GetMapping("/public/medicines")
-    public ResponseEntity<MedicineResponse> getAllMedicine(
-            @RequestParam(name = "keyword", required = false) String keyword,
-            @RequestParam(name="pageNumber",defaultValue = AppConstants.PAGE_NUMBER,required = false) Integer pageNumber,
-            @RequestParam(name = "pageSize",defaultValue = AppConstants.PAGE_SIZE,required = false) Integer pageSize,
-            @RequestParam(name = "sortBy",defaultValue = AppConstants.SORT_MEDICINE_BY,required = false) String sortBy,
-            @RequestParam(name = "sortOrder",defaultValue = AppConstants.SORT_DIR,required = false) String sortOrder
-    ){
-       MedicineResponse medicineResponse =  medicineService.getAllMedicines(pageNumber,pageSize,sortBy,sortOrder,keyword);
-        return new ResponseEntity<>(medicineResponse,HttpStatus.OK );
+    public ResponseEntity<MedicineResponse> getAllMedicines(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = AppConstants.PAGE_NUMBER) Integer pageNumber,
+            @RequestParam(defaultValue = AppConstants.PAGE_SIZE) Integer pageSize,
+            @RequestParam(defaultValue = AppConstants.SORT_MEDICINE_BY) String sortBy,
+            @RequestParam(defaultValue = AppConstants.SORT_DIR) String sortOrder
+    ) {
+
+        return ResponseEntity.ok(
+                medicineService.getAllMedicines(
+                        pageNumber,
+                        pageSize,
+                        sortBy,
+                        sortOrder,
+                        keyword)
+        );
     }
 
-    @GetMapping("/seller/medicines")
-    public ResponseEntity<MedicineResponse> getAllMedicinesForSeller(
-            @RequestParam(name="pageNumber",defaultValue = AppConstants.PAGE_NUMBER,required = false) Integer pageNumber,
-            @RequestParam(name = "pageSize",defaultValue = AppConstants.PAGE_SIZE,required = false) Integer pageSize,
-            @RequestParam(name = "sortBy",defaultValue = AppConstants.SORT_MEDICINE_BY,required = false) String sortBy,
-            @RequestParam(name = "sortOrder",defaultValue = AppConstants.SORT_DIR,required = false) String sortOrder
-    ){
-        MedicineResponse medicineResponse =  medicineService.getAllMedicinesForSeller(pageNumber,pageSize,sortBy,sortOrder);
-        return new ResponseEntity<>(medicineResponse,HttpStatus.OK );
+    // ================= SELLER MEDICINES =================
+    @GetMapping("/seller/shop/{shopId}/medicines")
+    public ResponseEntity<MedicineResponse> getSellerMedicines(
+            @PathVariable Long shopId,
+            @RequestParam(defaultValue = AppConstants.PAGE_NUMBER) Integer pageNumber,
+            @RequestParam(defaultValue = AppConstants.PAGE_SIZE) Integer pageSize,
+            @RequestParam(defaultValue = AppConstants.SORT_MEDICINE_BY) String sortBy,
+            @RequestParam(defaultValue = AppConstants.SORT_DIR) String sortOrder
+    ) {
+
+        return ResponseEntity.ok(
+                medicineService.getAllMedicinesForSeller(
+                        shopId,
+                        pageNumber,
+                        pageSize,
+                        sortBy,
+                        sortOrder)
+        );
     }
 
+    // ================= NEARBY MEDICINE SEARCH =================
+    @GetMapping("/public/medicines/nearby")
+    public ResponseEntity<List<MedicineDTO>> searchNearbyMedicine(
+            @RequestParam String keyword,
+            @RequestParam Double userLat,
+            @RequestParam Double userLng,
+            @RequestParam(defaultValue = "5") Double radiusKm
+    ) {
 
-    @GetMapping("/public/medicines/{keyword}/keyword")
-    public  ResponseEntity<MedicineResponse>getProductByKeyword(@PathVariable String keyword,
-                                                               @RequestParam(name="pageNumber",defaultValue = AppConstants.PAGE_NUMBER,required = false) Integer pageNumber,
-                                                               @RequestParam(name = "pageSize",defaultValue = AppConstants.PAGE_SIZE,required = false) Integer pageSize,
-                                                               @RequestParam(name = "sortBy",defaultValue = AppConstants.SORT_MEDICINE_BY,required = false) String sortBy,
-                                                               @RequestParam(name = "sortOrder",defaultValue = AppConstants.SORT_DIR,required = false) String sortOrder)
-    {
-        MedicineResponse medicineResponse = medicineService.searchMedicineByKeyword(keyword,pageNumber,pageSize,sortBy,sortOrder);
-        return new ResponseEntity<>(medicineResponse,HttpStatus.FOUND);
+        return ResponseEntity.ok(
+                medicineService.searchNearbyMedicine(
+                        keyword,
+                        userLat,
+                        userLng,
+                        radiusKm
+                )
+        );
     }
 
-    @PutMapping("/seller/medicine/{medicineId}")
-    public ResponseEntity<MedicineDTO>updateMedicine(@Valid @RequestBody MedicineDTO medicineDTO,
-                                                   @PathVariable Long medicineId){
-        MedicineDTO updateMedicineDTO = medicineService.updateProduct(medicineId,medicineDTO);
-        return new ResponseEntity<>(updateMedicineDTO,HttpStatus.OK);
+    // ================= UPDATE MEDICINE =================
+    @PutMapping("/seller/shop/{shopId}/medicine/{medicineId}")
+    public ResponseEntity<MedicineDTO> updateMedicine(
+            @PathVariable Long shopId,
+            @PathVariable Long medicineId,
+            @Valid @RequestBody MedicineDTO medicineDTO) {
+
+        return ResponseEntity.ok(
+                medicineService.updateProduct(
+                        shopId,
+                        medicineId,
+                        medicineDTO)
+        );
     }
 
-    @DeleteMapping("/seller/medicine/{medicineId}")
-    public  ResponseEntity<MedicineDTO> deleteProduct(@PathVariable Long medicineId){
-        MedicineDTO deleteMedicine = medicineService.deleteMedicine(medicineId);
-        return new ResponseEntity<>(deleteMedicine,HttpStatus.OK);
+    // ================= DELETE MEDICINE =================
+    @DeleteMapping("/seller/shop/{shopId}/medicine/{medicineId}")
+    public ResponseEntity<MedicineDTO> deleteMedicine(
+            @PathVariable Long shopId,
+            @PathVariable Long medicineId) {
+
+        return ResponseEntity.ok(
+                medicineService.deleteMedicine(
+                        shopId,
+                        medicineId)
+        );
     }
 
-    @PutMapping("/seller/medicines/{medicineId}/image")
-    public ResponseEntity<MedicineDTO>updateMedicineImage(@PathVariable Long medicineId,
-                                                        @RequestParam("image") MultipartFile image) throws IOException {
-        MedicineDTO updatedProduct = medicineService.updateMedicineImage(medicineId,image);
-        return  new ResponseEntity<>(updatedProduct,HttpStatus.OK);
+    // ================= UPDATE IMAGE =================
+    @PutMapping("/seller/shop/{shopId}/medicine/{medicineId}/image")
+    public ResponseEntity<MedicineDTO> updateMedicineImage(
+            @PathVariable Long shopId,
+            @PathVariable Long medicineId,
+            @RequestParam("image") MultipartFile image)
+            throws IOException {
+
+        return ResponseEntity.ok(
+                medicineService.updateMedicineImage(
+                        shopId,
+                        medicineId,
+                        image)
+        );
     }
-
-
 }
