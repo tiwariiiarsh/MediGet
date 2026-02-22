@@ -7,7 +7,7 @@ public class ShopDTO {
 
     private Long shopId;
     private String shopName;
-
+    private String buildingName;
     private String street;
     private String city;
     private String state;

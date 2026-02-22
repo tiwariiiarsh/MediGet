@@ -1,6 +1,7 @@
 package com.example.MediSearch.controller;
 
 import com.example.MediSearch.payload.ShopDTO;
+import com.example.MediSearch.security.response.MessageResponse;
 import com.example.MediSearch.service.ShopService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,11 +17,13 @@ public class ShopController {
 
     // ================= CREATE =================
     @PostMapping
-    public ResponseEntity<ShopDTO> createShop(
+    public ResponseEntity<?> createShop(
             @Valid @RequestBody ShopDTO shopDTO) {
 
+        ShopDTO savedShop = shopService.createShop(shopDTO);
+
         return ResponseEntity.ok(
-                shopService.createShop(shopDTO));
+                new MessageResponse("Shop added successfully"));
     }
 
     // ================= GET MY SHOP =================

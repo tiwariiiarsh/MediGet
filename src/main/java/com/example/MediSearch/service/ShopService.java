@@ -1,6 +1,7 @@
 package com.example.MediSearch.service;
 
 import com.example.MediSearch.payload.ShopDTO;
+import com.example.MediSearch.security.response.MessageResponse;
 
 public interface ShopService {
 
