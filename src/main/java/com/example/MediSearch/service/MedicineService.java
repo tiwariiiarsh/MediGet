@@ -6,18 +6,37 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
+
 public interface MedicineService {
-    MedicineDTO addMedicine(MedicineDTO medicineDTO);
 
-    MedicineResponse getAllMedicines(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder, String keyword);
+    MedicineDTO addMedicine(Long shopId, MedicineDTO medicineDTO);
 
-    MedicineResponse getAllMedicinesForSeller(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
+    MedicineResponse getAllMedicines(Integer pageNumber,
+                                     Integer pageSize,
+                                     String sortBy,
+                                     String sortOrder,
+                                     String keyword);
 
-    MedicineResponse searchMedicineByKeyword(String keyword, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
+    MedicineResponse getAllMedicinesForSeller(Long shopId,
+                                              Integer pageNumber,
+                                              Integer pageSize,
+                                              String sortBy,
+                                              String sortOrder);
 
-    MedicineDTO updateProduct(Long medicineId, MedicineDTO medicineDTO);
+    MedicineResponse searchMedicineByKeyword(String keyword,
+                                             Integer pageNumber,
+                                             Integer pageSize,
+                                             String sortBy,
+                                             String sortOrder);
 
-    MedicineDTO deleteMedicine(Long medicineId);
+    MedicineDTO updateProduct(Long shopId,
+                              Long medicineId,
+                              MedicineDTO medicineDTO);
 
-    MedicineDTO updateMedicineImage(Long medicineId, MultipartFile image) throws IOException;
+    MedicineDTO deleteMedicine(Long shopId,
+                               Long medicineId);
+
+    MedicineDTO updateMedicineImage(Long shopId,
+                                    Long medicineId,
+                                    MultipartFile image) throws IOException;
 }

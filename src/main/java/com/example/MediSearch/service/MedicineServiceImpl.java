@@ -19,86 +19,98 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 
+
+
 @Service
 public class MedicineServiceImpl implements MedicineService {
-
-    @Autowired
-    private ModelMapper modelMapper;
-
-    @Autowired
-    private AuthUtils authUtils;
 
     @Autowired
     private MedicineRepository medicineRepository;
 
     @Autowired
+    private ShopRepository shopRepository;
+
+    @Autowired
+    private AuthUtils authUtils;
+
+    @Autowired
+    private ModelMapper modelMapper;
+
+    @Autowired
     private FileService fileService;
-
-    @Value("${product.image}")
-    private String path;
-
-    @Value("${image.base.url}")
-    private String imageBaseUrl;
 
     // ================= ADD MEDICINE =================
 
     @Override
-    public MedicineDTO addMedicine(MedicineDTO medicineDTO) {
+    public MedicineDTO addMedicine(Long shopId,
+                                   MedicineDTO medicineDTO) {
 
-        Medicine medicine = modelMapper.map(medicineDTO, Medicine.class);
+        User seller = authUtils.loggedInUser();
 
+        Shop shop = shopRepository.findById(shopId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Shop","shopId",shopId));
 
+        if (!shop.getSeller().getUserId()
+                .equals(seller.getUserId())) {
+            throw new ApiException("Not authorized to add medicine");
+        }
+
+        Medicine medicine =
+                modelMapper.map(medicineDTO, Medicine.class);
+
+        medicine.setShop(shop);
         medicine.setImage("default.png");
 
-        double specialPrice = medicine.getPrice() -
-                ((medicine.getDiscount() * 0.01) * medicine.getPrice());
+        double specialPrice =
+                medicine.getPrice()
+                        - ((medicine.getDiscount() * 0.01)
+                        * medicine.getPrice());
 
         medicine.setSpecialPrice(specialPrice);
 
-        Medicine savedMedicine = medicineRepository.save(medicine);
+        Medicine saved =
+                medicineRepository.save(medicine);
 
-        return modelMapper.map(savedMedicine, MedicineDTO.class);
+        return modelMapper.map(saved, MedicineDTO.class);
     }
 
-    // ================= GET ALL MEDICINES =================
+    // ================= PUBLIC GET ALL =================
 
     @Override
-    public MedicineResponse getAllMedicines(
-            Integer pageNumber,
-            Integer pageSize,
-            String sortBy,
-            String sortOrder,
-            String keyword) {
+    public MedicineResponse getAllMedicines(Integer pageNumber,
+                                            Integer pageSize,
+                                            String sortBy,
+                                            String sortOrder,
+                                            String keyword) {
 
         if (pageNumber == null) pageNumber = 0;
         if (pageSize == null) pageSize = 5;
-        if (sortBy == null || sortBy.isBlank()) sortBy = "medicineId";
-        if (sortOrder == null || sortOrder.isBlank()) sortOrder = "asc";
+        if (sortBy == null) sortBy = "medicineId";
+        if (sortOrder == null) sortOrder = "asc";
 
         Sort sort = sortOrder.equalsIgnoreCase("asc")
                 ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
 
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
+        Pageable pageable =
+                PageRequest.of(pageNumber, pageSize, sort);
 
-        Specification<Medicine> spec = Specification.where(null);
+        Page<Medicine> pageData;
 
         if (keyword != null && !keyword.isBlank()) {
-            spec = spec.and((root, query, cb) ->
-                    cb.like(
-                            cb.lower(root.get("medicineName")),
-                            "%" + keyword.toLowerCase() + "%"
-                    )
-            );
+            pageData = medicineRepository
+                    .findByMedicineNameContainingIgnoreCase(
+                            keyword, pageable);
+        } else {
+            pageData = medicineRepository.findAll(pageable);
         }
 
-        Page<Medicine> pageData =
-                medicineRepository.findAll(spec, pageable);
-
-        List<MedicineDTO> dtos = pageData.getContent()
-                .stream()
-                .map(m -> modelMapper.map(m, MedicineDTO.class))
-                .toList();
+        List<MedicineDTO> dtos =
+                pageData.getContent()
+                        .stream()
+                        .map(m -> modelMapper.map(m, MedicineDTO.class))
+                        .toList();
 
         MedicineResponse response = new MedicineResponse();
         response.setContent(dtos);
@@ -114,79 +126,38 @@ public class MedicineServiceImpl implements MedicineService {
     // ================= SELLER MEDICINES =================
 
     @Override
-    public MedicineResponse getAllMedicinesForSeller(
-            Integer pageNumber,
-            Integer pageSize,
-            String sortBy,
-            String sortOrder) {
+    public MedicineResponse getAllMedicinesForSeller(Long shopId,
+                                                     Integer pageNumber,
+                                                     Integer pageSize,
+                                                     String sortBy,
+                                                     String sortOrder) {
 
-        if (pageNumber == null) pageNumber = 0;
-        if (pageSize == null) pageSize = 5;
-        if (sortBy == null || sortBy.isBlank()) sortBy = "medicineId";
-        if (sortOrder == null || sortOrder.isBlank()) sortOrder = "asc";
+        User seller = authUtils.loggedInUser();
 
-        Sort sort = sortOrder.equalsIgnoreCase("asc")
-                ? Sort.by(sortBy).ascending()
-                : Sort.by(sortBy).descending();
+        Shop shop = shopRepository.findById(shopId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Shop","shopId",shopId));
 
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
-
-        User user = authUtils.loggedInUser();
-
-        Page<Medicine> pageData =
-                medicineRepository.findByUser(user, pageable);
-
-        List<MedicineDTO> dtos = pageData.getContent()
-                .stream()
-                .map(m -> modelMapper.map(m, MedicineDTO.class))
-                .toList();
-
-        MedicineResponse response = new MedicineResponse();
-        response.setContent(dtos);
-        response.setPageNumber(pageData.getNumber());
-        response.setPageSize(pageData.getSize());
-        response.setTotalElements(pageData.getTotalElements());
-        response.setTotalPages(pageData.getTotalPages());
-        response.setLastPage(pageData.isLast());
-
-        return response;
-    }
-
-    // ================= SEARCH =================
-
-    @Override
-    public MedicineResponse searchMedicineByKeyword(
-            String keyword,
-            Integer pageNumber,
-            Integer pageSize,
-            String sortBy,
-            String sortOrder) {
-
-        if (pageNumber == null) pageNumber = 0;
-        if (pageSize == null) pageSize = 5;
-        if (sortBy == null || sortBy.isBlank()) sortBy = "medicineId";
-        if (sortOrder == null || sortOrder.isBlank()) sortOrder = "asc";
-
-        Sort sort = sortOrder.equalsIgnoreCase("asc")
-                ? Sort.by(sortBy).ascending()
-                : Sort.by(sortBy).descending();
-
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
-
-        Page<Medicine> pageData =
-                medicineRepository
-                        .findByMedicineNameContainingIgnoreCase(
-                                keyword, pageable);
-
-        if (pageData.isEmpty()) {
-            throw new ApiException(
-                    "Medicine not found with keyword: " + keyword);
+        if (!shop.getSeller().getUserId()
+                .equals(seller.getUserId())) {
+            throw new ApiException("Not authorized");
         }
 
-        List<MedicineDTO> dtos = pageData.getContent()
-                .stream()
-                .map(m -> modelMapper.map(m, MedicineDTO.class))
-                .toList();
+        Sort sort = sortOrder.equalsIgnoreCase("asc")
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        Pageable pageable =
+                PageRequest.of(pageNumber, pageSize, sort);
+
+        Page<Medicine> pageData =
+                medicineRepository.findByShop(shop, pageable);
+
+        List<MedicineDTO> dtos =
+                pageData.getContent()
+                        .stream()
+                        .map(m -> modelMapper.map(m, MedicineDTO.class))
+                        .toList();
 
         MedicineResponse response = new MedicineResponse();
         response.setContent(dtos);
@@ -202,65 +173,96 @@ public class MedicineServiceImpl implements MedicineService {
     // ================= UPDATE =================
 
     @Override
-    public MedicineDTO updateProduct(Long medicineId,
+    public MedicineDTO updateProduct(Long shopId,
+                                     Long medicineId,
                                      MedicineDTO medicineDTO) {
 
-        Medicine medicineFromDB = medicineRepository.findById(medicineId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Medicine",
-                                "medicineId",
-                                medicineId));
+        User seller = authUtils.loggedInUser();
 
-        modelMapper.map(medicineDTO, medicineFromDB);
+        Shop shop = shopRepository.findById(shopId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Shop","shopId",shopId));
+
+        if (!shop.getSeller().getUserId()
+                .equals(seller.getUserId())) {
+            throw new ApiException("Not authorized");
+        }
+
+        Medicine medicine =
+                medicineRepository.findById(medicineId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("Medicine",
+                                        "medicineId", medicineId));
+
+        if (!medicine.getShop().getShopId()
+                .equals(shopId)) {
+            throw new ApiException("Medicine does not belong to this shop");
+        }
+
+        modelMapper.map(medicineDTO, medicine);
 
         double specialPrice =
-                medicineFromDB.getPrice() -
-                        ((medicineFromDB.getDiscount() * 0.01)
-                                * medicineFromDB.getPrice());
+                medicine.getPrice()
+                        - ((medicine.getDiscount() * 0.01)
+                        * medicine.getPrice());
 
-        medicineFromDB.setSpecialPrice(specialPrice);
+        medicine.setSpecialPrice(specialPrice);
 
-        Medicine savedMedicine =
-                medicineRepository.save(medicineFromDB);
+        Medicine saved =
+                medicineRepository.save(medicine);
 
-        return modelMapper.map(savedMedicine, MedicineDTO.class);
+        return modelMapper.map(saved, MedicineDTO.class);
     }
 
     // ================= DELETE =================
 
     @Override
-    public MedicineDTO deleteMedicine(Long medicineId) {
+    public MedicineDTO deleteMedicine(Long shopId,
+                                      Long medicineId) {
 
-        Medicine medicineFromDB = medicineRepository.findById(medicineId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Medicine",
-                                "medicineId",
-                                medicineId));
+        Medicine medicine =
+                medicineRepository.findById(medicineId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("Medicine",
+                                        "medicineId", medicineId));
 
-        medicineRepository.delete(medicineFromDB);
+        if (!medicine.getShop().getShopId()
+                .equals(shopId)) {
+            throw new ApiException("Not authorized");
+        }
 
-        return modelMapper.map(medicineFromDB,
-                MedicineDTO.class);
+        medicineRepository.delete(medicine);
+
+        return modelMapper.map(medicine, MedicineDTO.class);
     }
 
+    // ================= IMAGE UPDATE =================
+
     @Override
-    public MedicineDTO updateMedicineImage(Long medicineId, MultipartFile image) throws IOException {
-//        Get medicine from DB'
-        Medicine medicineFromDB = medicineRepository.findById(medicineId)
-                .orElseThrow(() -> new ResourceNotFoundException("medicine","medicineId",medicineId));
-//        Upload image to server
-//        Get file name of uploaded image
-        String path = "images/";
-        String fileName =fileService.uploadImage(path,image);
+    public MedicineDTO updateMedicineImage(Long shopId,
+                                           Long medicineId,
+                                           MultipartFile image)
+            throws IOException {
 
+        Medicine medicine =
+                medicineRepository.findById(medicineId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("Medicine",
+                                        "medicineId", medicineId));
 
-//        updating the new file name to the medicine
-        medicineFromDB.setImage(fileName);
-//        save the updated medicine
-        Medicine updatedmedicine = medicineRepository.save(medicineFromDB);
-//        return DTO after mapping medicine to DTO
-        return  modelMapper.map(updatedmedicine,MedicineDTO.class);
+        if (!medicine.getShop().getShopId()
+                .equals(shopId)) {
+            throw new ApiException("Not authorized");
+        }
+
+        String fileName =
+                fileService.uploadImage("images/", image);
+
+        medicine.setImage(fileName);
+
+        Medicine saved =
+                medicineRepository.save(medicine);
+
+        return modelMapper.map(saved, MedicineDTO.class);
     }
 }
