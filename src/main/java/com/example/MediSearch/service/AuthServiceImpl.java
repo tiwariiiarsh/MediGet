@@ -99,31 +99,35 @@ public class AuthServiceImpl implements AuthService{
         Set<String> strRoles = signUpRequest.getRole();
         Set<Role> roles = new HashSet<>();
 
-        if (strRoles == null) {
+        if (strRoles == null || strRoles.isEmpty()) {
+
             Role userRole = roleRepository.findByRoleName(AppRole.ROLE_USER)
-                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                    .orElseThrow(() -> new RuntimeException("Error: Role not found."));
             roles.add(userRole);
+
         } else {
-            strRoles.forEach(role -> {
-                switch (role) {
-                    case "admin":
-                        Role adminRole = roleRepository.findByRoleName(AppRole.ROLE_ADMIN)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(adminRole);
 
-                        break;
-                    case "seller":
-                        Role modRole = roleRepository.findByRoleName(AppRole.ROLE_SELLER)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(modRole);
+            for (String role : strRoles) {
 
+                switch (role.toUpperCase()) {
+
+                    case "ADMIN":
+                    case "ROLE_ADMIN":
+                        roles.add(roleRepository.findByRoleName(AppRole.ROLE_ADMIN)
+                                .orElseThrow(() -> new RuntimeException("Error: Role not found.")));
                         break;
+
+                    case "SELLER":
+                    case "ROLE_SELLER":
+                        roles.add(roleRepository.findByRoleName(AppRole.ROLE_SELLER)
+                                .orElseThrow(() -> new RuntimeException("Error: Role not found.")));
+                        break;
+
                     default:
-                        Role userRole = roleRepository.findByRoleName(AppRole.ROLE_USER)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(userRole);
+                        roles.add(roleRepository.findByRoleName(AppRole.ROLE_USER)
+                                .orElseThrow(() -> new RuntimeException("Error: Role not found.")));
                 }
-            });
+            }
         }
 
         user.setRoles(roles);

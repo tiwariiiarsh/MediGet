@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class ShopDTO {
 
-    private Long shopId;
+
     private String shopName;
     private String buildingName;
     private String street;

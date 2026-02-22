@@ -46,14 +46,22 @@ public class MedicineServiceImpl implements MedicineService {
 
         Shop shop = validateSeller(shopId);
 
+        if (dto.getPrice() == null)
+            throw new ApiException("Price must not be null");
+
+        Double discount = dto.getDiscount() == null ? 0.0 : dto.getDiscount();
+
+        if (discount < 0 || discount > 100)
+            throw new ApiException("Discount must be between 0 and 100");
+
         Medicine medicine = modelMapper.map(dto, Medicine.class);
+
         medicine.setShop(shop);
         medicine.setImage("default.png");
+        medicine.setDiscount(discount);
 
         double specialPrice =
-                medicine.getPrice() -
-                        ((medicine.getDiscount() * 0.01)
-                                * medicine.getPrice());
+                dto.getPrice() - ((discount / 100) * dto.getPrice());
 
         medicine.setSpecialPrice(specialPrice);
 
@@ -75,7 +83,8 @@ public class MedicineServiceImpl implements MedicineService {
 
         Page<Medicine> pageData =
                 (keyword != null && !keyword.isBlank())
-                        ? medicineRepository.findByMedicineNameContainingIgnoreCase(keyword, pageable)
+                        ? medicineRepository
+                        .findByMedicineNameContainingIgnoreCase(keyword, pageable)
                         : medicineRepository.findAll(pageable);
 
         List<MedicineDTO> dtos =
@@ -136,8 +145,8 @@ public class MedicineServiceImpl implements MedicineService {
 
         List<Medicine> medicines =
                 medicineRepository
-                        .findByMedicineNameContainingIgnoreCase(keyword,
-                                Pageable.unpaged())
+                        .findByMedicineNameContainingIgnoreCase(
+                                keyword, Pageable.unpaged())
                         .getContent();
 
         return medicines.stream()
@@ -172,26 +181,35 @@ public class MedicineServiceImpl implements MedicineService {
 
         validateSeller(shopId);
 
-        Medicine medicine =
-                medicineRepository.findById(medicineId)
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException("Medicine", "medicineId", medicineId));
+        Medicine medicine = medicineRepository.findById(medicineId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Medicine", "medicineId", medicineId));
 
         if (!medicine.getShop().getShopId().equals(shopId))
             throw new ApiException("Not authorized");
 
-        modelMapper.map(dto, medicine);
+        // 🔥 MANUAL MAPPING (SAFE)
+
+        medicine.setMedicineName(dto.getMedicineName());
+        medicine.setDescription(dto.getDescription());
+        medicine.setQuantity(dto.getQuantity());
+        medicine.setPrice(dto.getPrice());
+        medicine.setDiscount(dto.getDiscount());
+
+        Double discount =
+                dto.getDiscount() == null ? 0.0 : dto.getDiscount();
+
+        if (discount < 0 || discount > 100)
+            throw new ApiException("Discount must be between 0 and 100");
 
         double specialPrice =
-                medicine.getPrice() -
-                        ((medicine.getDiscount() * 0.01)
-                                * medicine.getPrice());
+                dto.getPrice() - ((discount / 100) * dto.getPrice());
 
         medicine.setSpecialPrice(specialPrice);
 
         return convertToDTO(medicineRepository.save(medicine));
     }
-
     // ================= DELETE =================
 
     @Override
@@ -203,7 +221,8 @@ public class MedicineServiceImpl implements MedicineService {
         Medicine medicine =
                 medicineRepository.findById(medicineId)
                         .orElseThrow(() ->
-                                new ResourceNotFoundException("Medicine", "medicineId", medicineId));
+                                new ResourceNotFoundException(
+                                        "Medicine", "medicineId", medicineId));
 
         if (!medicine.getShop().getShopId().equals(shopId))
             throw new ApiException("Not authorized");
@@ -225,7 +244,11 @@ public class MedicineServiceImpl implements MedicineService {
         Medicine medicine =
                 medicineRepository.findById(medicineId)
                         .orElseThrow(() ->
-                                new ResourceNotFoundException("Medicine", "medicineId", medicineId));
+                                new ResourceNotFoundException(
+                                        "Medicine", "medicineId", medicineId));
+
+        if (!medicine.getShop().getShopId().equals(shopId))
+            throw new ApiException("Not authorized");
 
         String fileName =
                 fileService.uploadImage("images/", image);
@@ -235,7 +258,7 @@ public class MedicineServiceImpl implements MedicineService {
         return convertToDTO(medicineRepository.save(medicine));
     }
 
-    // ================= COMMON METHODS =================
+    // ================= COMMON =================
 
     private Shop validateSeller(Long shopId) {
 
@@ -245,7 +268,8 @@ public class MedicineServiceImpl implements MedicineService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Shop", "shopId", shopId));
 
-        if (!shop.getSeller().getUserId().equals(seller.getUserId()))
+        if (!shop.getSeller().getUserId()
+                .equals(seller.getUserId()))
             throw new ApiException("Unauthorized");
 
         return shop;
@@ -270,11 +294,21 @@ public class MedicineServiceImpl implements MedicineService {
 
     private MedicineDTO convertToDTO(Medicine medicine) {
 
-        MedicineDTO dto = modelMapper.map(medicine, MedicineDTO.class);
+        MedicineDTO dto = new MedicineDTO();
 
-        dto.setShopId(medicine.getShop().getShopId());
-        dto.setShopName(medicine.getShop().getShopName());
-        dto.setShopCity(medicine.getShop().getCity());
+//        dto.setMedicineId(medicine.getMedicineId());
+        dto.setMedicineName(medicine.getMedicineName());
+        dto.setDescription(medicine.getDescription());
+        dto.setQuantity(medicine.getQuantity());
+        dto.setPrice(medicine.getPrice());
+        dto.setDiscount(medicine.getDiscount());
+        dto.setSpecialPrice(medicine.getSpecialPrice());
+        dto.setImage(medicine.getImage());
+
+        if (medicine.getShop() != null) {
+            dto.setShopName(medicine.getShop().getShopName()); // explicitly set
+            dto.setShopCity(medicine.getShop().getCity());
+        }
 
         return dto;
     }

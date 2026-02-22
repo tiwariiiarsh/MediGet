@@ -1,8 +1,7 @@
 package com.example.MediSearch.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,9 +27,16 @@ public class Medicine {
     private String description;
 
     private Integer quantity;
-    private Double price; //100
+    @NotNull
+    @Positive
+    private Double price;
+
+
+    @Min(0)
+    @Max(100)
+    private Double discount;
     private Double specialPrice;  //75
-    private Double discount; //25
+
     private String image;
 
 
