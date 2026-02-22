@@ -47,7 +47,7 @@ public class MedicineServiceImpl implements MedicineService {
 
         Medicine medicine = modelMapper.map(medicineDTO, Medicine.class);
 
-        medicine.setUser(authUtils.loggedInUser());
+
         medicine.setImage("default.png");
 
         double specialPrice = medicine.getPrice() -
