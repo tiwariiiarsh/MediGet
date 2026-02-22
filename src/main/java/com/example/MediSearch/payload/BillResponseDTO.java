@@ -12,5 +12,5 @@ public class BillResponseDTO {
     private String shopName;
     private LocalDate billDate;
     private Double totalAmount;
-    private List<CartItemDTO> items;
+    List<BillItemResponseDTO> items;
 }

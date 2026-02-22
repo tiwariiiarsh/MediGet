@@ -1,11 +1,7 @@
 package com.example.MediSearch.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
+import lombok.*;
 
 @Entity
 @Getter
@@ -19,14 +15,16 @@ public class BillItem {
     private Long billItemId;
 
     @ManyToOne
-    @JoinColumn(name = "bill_id")
+    @JoinColumn(name = "bill_id", nullable = false)
     private Bill bill;
 
     @ManyToOne
-    @JoinColumn(name = "medicine_id")
+    @JoinColumn(name = "medicine_id", nullable = false)
     private Medicine medicine;
 
     private Integer quantity;
 
-    private Double priceAtSale;
+    private Double price;        // price at time of sale
+
+    private Double totalPrice;   // quantity × price
 }
