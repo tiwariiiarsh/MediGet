@@ -280,10 +280,17 @@ public class MedicineServiceImpl implements MedicineService {
                                  String sortBy,
                                  String sortOrder) {
 
-        if (pageNumber == null) pageNumber = 0;
-        if (pageSize == null) pageSize = 5;
-        if (sortBy == null) sortBy = "medicineId";
-        if (sortOrder == null) sortOrder = "asc";
+        if (pageNumber == null || pageNumber < 0)
+            pageNumber = 0;
+
+        if (pageSize == null || pageSize <= 0)
+            pageSize = 5;
+
+        if (sortBy == null || sortBy.isBlank())
+            sortBy = "medicineId";
+
+        if (sortOrder == null || sortOrder.isBlank())
+            sortOrder = "asc";
 
         Sort sort = sortOrder.equalsIgnoreCase("asc")
                 ? Sort.by(sortBy).ascending()
@@ -291,7 +298,6 @@ public class MedicineServiceImpl implements MedicineService {
 
         return PageRequest.of(pageNumber, pageSize, sort);
     }
-
     private MedicineDTO convertToDTO(Medicine medicine) {
 
         MedicineDTO dto = new MedicineDTO();
