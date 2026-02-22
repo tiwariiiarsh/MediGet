@@ -77,9 +77,8 @@ public class MedicineController {
             @RequestParam String keyword,
             @RequestParam Double userLat,
             @RequestParam Double userLng,
-            @RequestParam(defaultValue = "5") Double radiusKm
+            @RequestParam(required = false) Double radiusKm
     ) {
-
         return ResponseEntity.ok(
                 medicineService.searchNearbyMedicine(
                         keyword,

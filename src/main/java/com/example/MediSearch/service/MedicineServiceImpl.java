@@ -143,6 +143,12 @@ public class MedicineServiceImpl implements MedicineService {
                                                   Double userLng,
                                                   Double radiusKm) {
 
+        // Safety checks
+        if (keyword == null || keyword.isBlank()
+                || userLat == null || userLng == null) {
+            return List.of();
+        }
+
         List<Medicine> medicines =
                 medicineRepository
                         .findByMedicineNameContainingIgnoreCase(
@@ -150,8 +156,15 @@ public class MedicineServiceImpl implements MedicineService {
                         .getContent();
 
         return medicines.stream()
-                .filter(m -> m.getQuantity() > 0)
+                // ✔ Only available stock
+                .filter(m -> m.getQuantity() != null && m.getQuantity() > 0)
+
                 .map(m -> {
+
+                    if (m.getShop() == null
+                            || m.getShop().getLatitude() == null
+                            || m.getShop().getLongitude() == null)
+                        return null;
 
                     double distance =
                             DistanceUtil.calculateDistance(
@@ -160,18 +173,22 @@ public class MedicineServiceImpl implements MedicineService {
                                     m.getShop().getLatitude(),
                                     m.getShop().getLongitude());
 
-                    if (distance <= radiusKm) {
-                        MedicineDTO dto = convertToDTO(m);
-                        dto.setDistance(distance);
-                        return dto;
-                    }
-                    return null;
+                    //  If user selected radius → apply filter
+                    if (radiusKm != null && distance > radiusKm)
+                        return null;
+
+                    MedicineDTO dto = convertToDTO(m);
+                    dto.setDistance(distance);
+                    return dto;
                 })
-                .filter(m -> m != null)
+
+                .filter(dto -> dto != null)
+
+                // ✔ Sort nearest first
                 .sorted(Comparator.comparingDouble(MedicineDTO::getDistance))
+
                 .toList();
     }
-
     // ================= UPDATE =================
 
     @Override
