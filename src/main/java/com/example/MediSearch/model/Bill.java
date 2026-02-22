@@ -23,6 +23,7 @@ public class Bill {
     private Long billId;
 
     @ManyToOne
+    @JoinColumn(name = "shop_id")
     private Shop shop;
 
     private LocalDate billDate;

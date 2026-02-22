@@ -1,9 +1,6 @@
 package com.example.MediSearch.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,9 +19,11 @@ public class BillItem {
     private Long billItemId;
 
     @ManyToOne
+    @JoinColumn(name = "bill_id")
     private Bill bill;
 
     @ManyToOne
+    @JoinColumn(name = "medicine_id")
     private Medicine medicine;
 
     private Integer quantity;
