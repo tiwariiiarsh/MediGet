@@ -23,11 +23,12 @@ public interface MedicineService {
                                               String sortBy,
                                               String sortOrder);
 
-    MedicineResponse searchMedicineByKeyword(String keyword,
-                                             Integer pageNumber,
-                                             Integer pageSize,
-                                             String sortBy,
-                                             String sortOrder);
+    List<MedicineSearchResponse> searchNearbyMedicine(
+            String keyword,
+            Double userLat,
+            Double userLng,
+            Double radiusKm
+    );
 
     MedicineDTO updateProduct(Long shopId,
                               Long medicineId,

@@ -18,4 +18,11 @@ public class MedicineDTO {
     private Double specialPrice;  //75
     private Double discount; //25
     private String image;
+
+    // For user search display
+    private Long shopId;
+    private String shopName;
+    private String shopCity;
+    private Double distance;
+
 }

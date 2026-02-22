@@ -48,13 +48,19 @@ public class Shop {
     @Size(min = 5,message = "Pincode  must be atleast 5 characters")
     public String pincode;
 
-    // ================= UNIQUE SELLER =================
+    // For nearby search
+    private Double latitude;
+    private Double longitude;
+
+    private Boolean isOpen = true;
+
+    // 🔥 ONE SELLER ONE SHOP
     @OneToOne
     @MapsId
     @JoinColumn(name = "shop_id")
     private User seller;
 
-    // ================= ONE SHOP MANY MEDICINES =================
+    // 🔥 ONE SHOP MANY MEDICINES
     @OneToMany(mappedBy = "shop",
             cascade = CascadeType.ALL,
             orphanRemoval = true)
