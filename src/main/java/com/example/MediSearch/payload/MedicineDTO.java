@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class MedicineDTO {
 
-//    private Long medicineId;
+    private Long medicineId;
 //    private String barcode;
     private String medicineName;
     private String description;

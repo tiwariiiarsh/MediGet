@@ -98,8 +98,13 @@ public class BillServiceImpl implements BillService {
             billItem.setBill(bill);  // VERY IMPORTANT
             billItem.setMedicine(medicine);
             billItem.setQuantity(item.getQuantity());
-            billItem.setPrice(
-                    medicine.getSpecialPrice());
+//            billItem.setPrice(
+//                    medicine.getSpecialPrice());
+            Double price = medicine.getSpecialPrice() != null
+                    ? medicine.getSpecialPrice()
+                    : medicine.getPrice();
+
+            billItem.setPrice(price);
 
             double itemTotal =
                     item.getQuantity()

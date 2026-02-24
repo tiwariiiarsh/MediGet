@@ -319,7 +319,7 @@ public class MedicineServiceImpl implements MedicineService {
 
         MedicineDTO dto = new MedicineDTO();
 
-//        dto.setMedicineId(medicine.getMedicineId());
+        dto.setMedicineId(medicine.getMedicineId());
         dto.setMedicineName(medicine.getMedicineName());
         dto.setDescription(medicine.getDescription());
         dto.setQuantity(medicine.getQuantity());
