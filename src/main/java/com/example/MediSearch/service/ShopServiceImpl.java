@@ -131,7 +131,7 @@ public class ShopServiceImpl implements ShopService {
                     m.setDiscount(med.getDiscount());
                     m.setSpecialPrice(med.getSpecialPrice());
                     m.setImage(med.getImage());
-
+                    m.setShopId(med.getShop().getShopId());
                     m.setShopName(shop.getShopName());
                     m.setShopCity(shop.getCity());
 

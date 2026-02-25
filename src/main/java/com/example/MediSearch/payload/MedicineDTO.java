@@ -26,6 +26,8 @@ public class MedicineDTO {
     private String shopCity;
     private Double distance;
 
+    private Long shopId;
+
     public Double getDistance() {
         return distance;
     }

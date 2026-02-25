@@ -334,6 +334,7 @@ public class MedicineServiceImpl implements MedicineService {
         if (medicine.getShop() != null) {
             dto.setShopName(medicine.getShop().getShopName());
             dto.setShopCity(medicine.getShop().getCity());
+            dto.setShopId(medicine.getShop().getShopId()); // 🔥 THIS WAS MISSING
         }
 
         return dto;
