@@ -9,14 +9,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/seller/shop")
+@RequestMapping("/api")
 public class ShopController {
 
     @Autowired
     private ShopService shopService;
 
     // ================= CREATE =================
-    @PostMapping
+    @PostMapping("/seller/shop")
     public ResponseEntity<?> createShop(
             @Valid @RequestBody ShopDTO shopDTO) {
 
@@ -27,7 +27,7 @@ public class ShopController {
     }
 
     // ================= GET MY SHOP =================
-    @GetMapping
+    @GetMapping("/seller/shop")
     public ResponseEntity<ShopDTO> getMyShop() {
 
         return ResponseEntity.ok(
@@ -35,7 +35,7 @@ public class ShopController {
     }
 
     // ================= UPDATE =================
-    @PutMapping
+    @PutMapping("/seller/shop")
     public ResponseEntity<ShopDTO> updateShop(
             @Valid @RequestBody ShopDTO shopDTO) {
 
@@ -44,7 +44,7 @@ public class ShopController {
     }
 
     // ================= DELETE =================
-    @DeleteMapping
+    @DeleteMapping("/seller/shop")
     public ResponseEntity<String> deleteShop() {
 
         return ResponseEntity.ok(
