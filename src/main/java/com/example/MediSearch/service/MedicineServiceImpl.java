@@ -326,10 +326,13 @@ public class MedicineServiceImpl implements MedicineService {
         dto.setPrice(medicine.getPrice());
         dto.setDiscount(medicine.getDiscount());
         dto.setSpecialPrice(medicine.getSpecialPrice());
-        dto.setImage(medicine.getImage());
+
+        if (medicine.getImage() != null) {
+            dto.setImage("http://localhost:8080/images/" + medicine.getImage());
+        }
 
         if (medicine.getShop() != null) {
-            dto.setShopName(medicine.getShop().getShopName()); // explicitly set
+            dto.setShopName(medicine.getShop().getShopName());
             dto.setShopCity(medicine.getShop().getCity());
         }
 

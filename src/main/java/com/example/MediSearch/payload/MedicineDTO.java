@@ -14,25 +14,103 @@ import lombok.NoArgsConstructor;
 public class MedicineDTO {
 
     private Long medicineId;
-//    private String barcode;
     private String medicineName;
     private String description;
     private Integer quantity;
-    @NotNull
-    @Positive
     private Double price;
-
-
-    @Min(0)
-    @Max(100)
     private Double discount;
-    private Double specialPrice;  //75
+    private Double specialPrice;
     private String image;
-
-    // For user search display
 
     private String shopName;
     private String shopCity;
     private Double distance;
 
+    public Double getDistance() {
+        return distance;
+    }
+
+    public void setDistance(Double distance) {
+        this.distance = distance;
+    }
+
+    public Double getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(Double discount) {
+        this.discount = discount;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Long getMedicineId() {
+        return medicineId;
+    }
+
+    public void setMedicineId(Long medicineId) {
+        this.medicineId = medicineId;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public String getMedicineName() {
+        return medicineName;
+    }
+
+    public void setMedicineName(String medicineName) {
+        this.medicineName = medicineName;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
+
+    public String getShopName() {
+        return shopName;
+    }
+
+    public void setShopName(String shopName) {
+        this.shopName = shopName;
+    }
+
+    public String getShopCity() {
+        return shopCity;
+    }
+
+    public void setShopCity(String shopCity) {
+        this.shopCity = shopCity;
+    }
+
+    public Double getSpecialPrice() {
+        return specialPrice;
+    }
+
+    public void setSpecialPrice(Double specialPrice) {
+        this.specialPrice = specialPrice;
+    }
 }

@@ -3,7 +3,9 @@ package com.example.MediSearch.controller;
 import com.example.MediSearch.config.AppConstants;
 import com.example.MediSearch.payload.MedicineDTO;
 import com.example.MediSearch.payload.MedicineResponse;
+import com.example.MediSearch.payload.ShopDTO;
 import com.example.MediSearch.service.MedicineService;
+import com.example.MediSearch.service.ShopService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,9 @@ public class MedicineController {
 
     @Autowired
     private MedicineService medicineService;
+
+    @Autowired
+    private ShopService shopService;
 
     // ================= ADD MEDICINE =================
     @PostMapping("/seller/shop/{shopId}/medicine")
@@ -132,4 +137,6 @@ public class MedicineController {
                         image)
         );
     }
+
+
 }

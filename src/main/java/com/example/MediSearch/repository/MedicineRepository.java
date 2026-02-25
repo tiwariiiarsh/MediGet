@@ -7,6 +7,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 
 public interface MedicineRepository extends JpaRepository<Medicine, Long> {
 
@@ -16,4 +18,6 @@ public interface MedicineRepository extends JpaRepository<Medicine, Long> {
             String keyword,
             Pageable pageable
     );
+
+    List<Medicine> findByShop_ShopId(Long shopId);
 }

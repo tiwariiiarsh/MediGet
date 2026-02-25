@@ -50,4 +50,11 @@ public class ShopController {
         return ResponseEntity.ok(
                 shopService.deleteShop());
     }
+
+    @GetMapping("/public/shop/{shopId}")
+    public ResponseEntity<ShopDTO>getShopDetails(@PathVariable Long shopId){
+        ShopDTO shopDTO = shopService.getShopDetails(shopId);
+        return ResponseEntity.ok(shopDTO);
+    }
+
 }

@@ -12,4 +12,6 @@ public interface ShopService {
     ShopDTO updateShop(ShopDTO shopDTO);
 
     String deleteShop();
+
+    ShopDTO getShopDetails(Long shopId);
 }
