@@ -18,4 +18,10 @@ public interface BillRepository extends JpaRepository<Bill, Long> {
     ORDER BY SUM(bi.quantity) DESC
     """)
     List<Object[]> findMonthlySales(Long shopId);
+
+
+
+
+    // All bills for a shop
+    List<Bill> findByShop_ShopId(Long shopId);
 }
