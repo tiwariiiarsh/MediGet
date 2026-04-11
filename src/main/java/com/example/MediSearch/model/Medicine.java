@@ -45,5 +45,12 @@ public class Medicine {
     @JoinColumn(name = "shop_id", nullable = false)
     private Shop shop;
 
+    // Add this field to existing Medicine.java
+    @Column(name = "sales_count", nullable = false)
+    private Long salesCount = 0L;
+
+    @Column(name = "expiry_date")
+    private java.time.LocalDate expiryDate;
+
 
 }
