@@ -92,6 +92,12 @@ public class BillServiceImpl implements BillService {
                     medicine.getQuantity()
                             - item.getQuantity());
 
+            // In generateBill(), after reducing stock, ADD:
+            medicine.setSalesCount(
+                    (medicine.getSalesCount() == null ? 0L : medicine.getSalesCount())
+                            + item.getQuantity()
+            );
+
             medicineRepository.save(medicine);
 
             BillItem billItem = new BillItem();
