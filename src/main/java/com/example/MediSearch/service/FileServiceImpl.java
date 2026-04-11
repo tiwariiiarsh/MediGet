@@ -15,30 +15,29 @@ public class FileServiceImpl implements FileService {
 
     //    this part require some knowledge of file handling
     @Override
-    public String  uploadImage(String path, MultipartFile file) throws IOException {
-//        file name of current/original file
-        String originalFileName = file.getOriginalFilename();
-//        generate unique file name
-        String randomId = UUID.randomUUID().toString();
-//        randomId:"abc123xyz",originalFileName: "photo.png",concat:"abc123xyz" + ".png" → "abc123xyz.png"
-//        path → folder ka path jaha file save karni hai (ex: "uploads/images").
-//        filename → naya banaya hua unique file name (ex: "abc123.png").
-//        File.pathSeparator ❌ → ye system ka path separator hota hai (: in Mac/Linux, ; in Windows). Ye folders ke beech use nahi hota.
-//                Example: PATH environment variable me C:\bin;C:\jdk\bin → yaha ; separator hai.
-        String filename = randomId.concat(originalFileName.substring(originalFileName.lastIndexOf(".")));
-        String filePath = path + File.separator + filename;
+    public String uploadImage(String path, MultipartFile file) throws IOException {
 
-//        check if path exist and create
-        File folder = new File(path);
+        String originalFileName = file.getOriginalFilename();
+        String randomId = UUID.randomUUID().toString();
+
+        String extension = originalFileName.substring(originalFileName.lastIndexOf("."));
+        String filename = randomId + extension;
+
+        // 🔥 absolute path use karo
+        String uploadDir = System.getProperty("user.dir") + File.separator + path;
+
+        File folder = new File(uploadDir);
         if (!folder.exists()) {
-            folder.mkdir();
+            folder.mkdirs();  // mkdir → mkdirs
         }
-//        upload to the server
+
+        String filePath = uploadDir + File.separator + filename;
+
         Files.copy(file.getInputStream(), Paths.get(filePath));
 
-//        returning filename
-        return filename;
+        System.out.println("Saved at: " + filePath);
 
+        return filename;
     }
 
 }

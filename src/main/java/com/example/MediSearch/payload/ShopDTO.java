@@ -15,7 +15,7 @@ public class ShopDTO {
     private String state;
     private String country;
     private String pincode;
-
+    private String image;
     private Double latitude;
     private Double longitude;
 
