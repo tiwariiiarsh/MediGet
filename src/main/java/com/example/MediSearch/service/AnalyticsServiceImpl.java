@@ -45,6 +45,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
             AnalyticsDTO dto = new AnalyticsDTO();
             dto.setMedicineName((String) row[0]);
             dto.setTotalSold(((Number) row[1]).longValue());
+            dto.setRevenue(((Number) row[2]).doubleValue());
             return dto;
         }).collect(Collectors.toList());
     }
