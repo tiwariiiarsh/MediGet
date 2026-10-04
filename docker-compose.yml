@@ -1,14 +1,15 @@
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: mediget-mysql
+  postgres:
+    image: postgres:16
+    container_name: mediget-postgres
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-      MYSQL_DATABASE: medisearch
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: medisearch
     volumes:
-      - mysql-data:/var/lib/mysql
+      - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${DB_PASSWORD}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d medisearch"]
       interval: 10s
       retries: 10
     restart: unless-stopped
@@ -22,9 +23,9 @@ services:
     volumes:
       - ./images:/app/images
     depends_on:
-      mysql:
+      postgres:
         condition: service_healthy
     restart: unless-stopped
 
 volumes:
-  mysql-data:
+  postgres-data:

@@ -16,21 +16,22 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      mysql:
-        image: mysql:8.0
+      postgres:
+        image: postgres:16
         env:
-          MYSQL_ROOT_PASSWORD: ${{ secrets.CI_DB_PASSWORD }}
-          MYSQL_DATABASE: medisearch_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ${{ secrets.CI_DB_PASSWORD }}
+          POSTGRES_DB: medisearch_test
         ports:
-          - 3306:3306
+          - 5432:5432
         options: >-
-          --health-cmd="mysqladmin ping -h localhost"
+          --health-cmd="pg_isready -U postgres"
           --health-interval=10s
           --health-retries=10
 
     env:
-      DB_URL: jdbc:mysql://localhost:3306/medisearch_test
-      DB_USERNAME: root
+      DB_URL: jdbc:postgresql://localhost:5432/medisearch_test
+      DB_USERNAME: postgres
       DB_PASSWORD: ${{ secrets.CI_DB_PASSWORD }}
       JWT_SECRET: ${{ secrets.CI_JWT_SECRET }}
 
