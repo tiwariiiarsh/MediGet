@@ -59,6 +59,7 @@ public class MedicineServiceImpl implements MedicineService {
         medicine.setShop(shop);
         medicine.setImage("default.png");
         medicine.setDiscount(discount);
+        medicine.setSalesCount(0L);
 
         double specialPrice =
                 dto.getPrice() - ((discount / 100) * dto.getPrice());
