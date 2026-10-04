@@ -19,20 +19,20 @@ jobs:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_ROOT_PASSWORD: root
+          MYSQL_ROOT_PASSWORD: ${{ secrets.CI_DB_PASSWORD }}
           MYSQL_DATABASE: medisearch_test
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping -h localhost -proot"
+          --health-cmd="mysqladmin ping -h localhost"
           --health-interval=10s
           --health-retries=10
 
     env:
       DB_URL: jdbc:mysql://localhost:3306/medisearch_test
       DB_USERNAME: root
-      DB_PASSWORD: root
-      JWT_SECRET: ci-only-secret-0123456789abcdef0123456789abcdef
+      DB_PASSWORD: ${{ secrets.CI_DB_PASSWORD }}
+      JWT_SECRET: ${{ secrets.CI_JWT_SECRET }}
 
     steps:
       - uses: actions/checkout@v4
