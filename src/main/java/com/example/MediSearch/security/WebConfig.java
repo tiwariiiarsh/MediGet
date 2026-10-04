@@ -33,7 +33,9 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**") // 👈 sirf API ke liye CORS allow
-                .allowedOrigins(frontEndUrl) // ab properties se load hoga
+                .allowedOrigins(java.util.Arrays.stream(frontEndUrl.split(","))
+                        .map(u -> u.trim().replaceAll("^\"|\"$", "").replaceAll("/+$", ""))
+                        .toArray(String[]::new)) // comma separated, extra space/slash hata deta hai
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                  .allowCredentials(true);
